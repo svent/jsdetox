@@ -1,0 +1,71 @@
+= Installation
+
+JSDetox should work on most Linux distributions - major versions get
+tested on the current LTS version of Linux Mint / Ubuntu.
+The development is currently done on Gentoo Linux with the latest
+chrome browser, so that combination should always work.
+
+
+== Installation on Linux Mint 13 / Ubuntu 12.04:
+
+=== Installation with ruby 1.9 on clean image, no ruby installed yet:
+  sudo apt-get install ruby1.9.1 ruby1.9.1-dev libxslt1-dev libxml2-dev build-essential git
+  sudo gem install bundler
+  cd #target-dir#
+  git clone https://github.com/svent/jsdetox.git
+  cd jsdetox
+  sudo bundle install
+
+=== Installation with ruby 1.8 on clean image, no ruby installed yet:
+  sudo apt-get install rubygems libxslt1-dev libxml2-dev build-essential git
+  sudo gem install bundler
+  cd #target-dir#
+  git clone https://github.com/svent/jsdetox.git
+  cd jsdetox
+  sudo bundle install
+
+=== Used installation, system wide upgrade from ruby 1.8 to ruby 1.9
+  # Be careful, this might break other software already installed that
+  # depends on ruby 1.8
+  sudo apt-get install ruby1.9.1 ruby1.9.1-dev libxslt1-dev libxml2-dev build-essential git
+  # select ruby 1.9:
+  sudo update-alternatives --config ruby
+  # select ruby 1.9:
+  sudo update-alternatives --config gem
+  sudo gem install bundler
+  cd #target-dir#
+  git clone https://github.com/svent/jsdetox.git
+  cd jsdetox
+  sudo bundle install
+
+
+= Updating
+The master branch in the github repository is stable, so just run this to
+update to the latest version:
+  cd #jsdetox-dir#
+  git pull
+  sudo bundle install
+
+
+= Dependencies
+
+JSDetox is written in ruby and compatible with version 1.8 and 1.9.
+Ruby 1.9 has a much better performance, so it is the recommended
+version.
+
+JSDetox has the following gem dependencies, managed with bundler:
+* rake
+* sass
+* haml
+* padrino
+* json
+* rkelly
+* therubyracer
+* nokogiri
+* hexdump
+
+The libraries metasm and taka come bundled with JSDetox as there is no
+maintained gem of the latest version available.
+
+You should use a modern HTML 5 capable browser to access the web gui
+(chrome and firefox get tested).

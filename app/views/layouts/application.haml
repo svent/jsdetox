@@ -1,0 +1,52 @@
+!!! Strict
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %title= [@title, "JSDetox"].compact.join(" | ")
+    /[if lt IE 9]
+      = javascript_include_tag 'html5'
+    = stylesheet_link_tag 'bootstrap', 'jquery-ui', 'application', 'prettify'
+    = javascript_include_tag 'jquery', 'jquery-ui.min', 'jquery-ujs', 'bootstrap-tab', 'bootstrap-button', 'bootstrap-dropdown', 'bootstrap-transition', 'bootstrap-tooltip', 'bootstrap-popover', 'bootstrap-modal', 'prettify', 'jquery.form', 'application'
+    = yield_content :include
+    :css
+      body>.container {
+        margin-top: -20px;
+        padding: 20px;
+        -webkit-border-radius: 6px 6px 6px 6px;
+           -moz-border-radius: 6px 6px 6px 6px;
+                border-radius: 6px 6px 6px 6px;
+        -webkit-box-shadow: 0 1px 15px rgba(0,0,0,.35);
+           -moz-box-shadow: 0 1px 15px rgba(0,0,0,.35);
+                box-shadow: 0 1px 15px rgba(0,0,0,.35);
+      }
+      body {
+        padding-top: 40px;
+        padding-bottom: 20px;
+      }
+      .page-header {
+        padding-top: 10px;
+      }
+
+  %body
+
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          %a.brand{ :href => '#' } JSDetox
+          %ul.nav
+            %li{ :class => (@current_nav == :analysis ? 'active' : '') }
+              = link_to 'Analysis', url(:analysis, :index)
+            %li{ :class => (@current_nav == :about ? 'active' : '') }
+              = link_to 'About', url(:pages, :index, 'about')
+
+
+    .container
+      - if @title
+        .page-header
+          %h1= @title
+          - if @subtitle
+            %h6= @subtitle
+      - else
+        %br/
+      = yield
+

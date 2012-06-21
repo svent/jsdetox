@@ -1,0 +1,8 @@
+This directory contains libraries used by JSDetox that are not
+available as a maintained gem.
+
+Metasm is included in its original version with some unused files
+removed.
+
+Taka contains some changes needed for JSDetox.
+

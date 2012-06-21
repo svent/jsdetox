@@ -1,0 +1,7 @@
+--- 
+:mock: none
+:script: jquery
+:stylesheet: sass
+:renderer: haml
+:test: none
+:orm: sequel

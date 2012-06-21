@@ -1,0 +1,597 @@
+- @title = "Analysis"
+- @current_nav = :analysis
+
+%br/
+.row-fluid
+
+  .span10
+    #alertbox
+      #successmsg.hide
+        .row-fluid
+          .span6.offset2
+            .alert.alert-success
+              %h4.alert-heading Message
+              %p
+      #errormsg.hide
+        .row-fluid
+          .span6.offset2
+            .alert.alert-error
+              %h4.alert-heading Error
+              %p
+
+    .tabbable
+      %ul.nav.nav-tabs{ :id => 'tabs_main' }
+        %li.active= link_to 'Code Analysis', '#tab_main_analysis', 'data-toggle' => 'tab'
+        %li= link_to 'HTML Document', '#tab_main_html', 'data-toggle' => 'tab'
+        %li= link_to 'Data Analysis', '#tab_main_data', 'data-toggle' => 'tab'
+
+    .tab-content
+      .tab-pane.active{ :id => 'tab_main_analysis' }
+        .btn-toolbar
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Analyze Javascript Code" }
+            %a.btn{ :id => 'btn-analyze', 'data-remoteurl' => url(:backend, :analyze, :format => 'json'), 'data-loading-text' => 'loading...' }
+              %i.icon-search
+              Analyze
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Reformat/Beautify Code" }
+            %button.btn{ :id => 'btn-reformat', 'data-remoteurl' => url(:backend, :reformat, :format => 'json'), 'data-loading-text' => 'formatting...' }
+              %i.icon-align-left
+              Reformat
+            %button.btn.dropdown-toggle{ 'data-toggle' => 'dropdown' }
+              %span.caret
+            %ul.dropdown-menu
+              %li
+                %a{ :id => 'btn-reformat-inline', 'data-remoteurl' => url(:backend, :reformat, :format => 'json'), :href => '#' } Reformat and Replace Code View
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Execute code with DOM emulation (see tab HTML Document)" }
+            %a.btn{ :type => 'submit', :id => 'btn-execute', 'data-remoteurl' => url(:backend, :execute, :format => 'json'), 'data-loading-text' => 'loading...' }
+              %i.icon-play
+              Execute
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Uload JS file for analysis" }
+            %a.btn{ :id => 'btn-js-upload', 'data-remoteurl' => url(:backend, :upload, :format => 'json'), 'data-loading-text' => 'loading...' }
+              %i.icon-upload
+              Upload
+
+        ~ text_area_tag :orig_code, :id => 'orig_code', :value => h(@orig_code), :class => 'span12 code', :rows => 10, :cols => 200
+        #js_upload_form.hide
+          = form_tag "jsdocform", :id => 'jsdocform', :action => url(:backend, :upload, :format => 'json'), :method => :post, :multipart => true do
+            = file_field_tag :js_file, :id => 'js_file'
+
+        %hr/
+
+        .tabbable
+          %ul.nav.nav-tabs{ :id => 'tabs_analysis' }
+            %li.active= link_to 'Code', '#tab_analysis_code', 'data-toggle' => 'tab'
+            %li= link_to 'Execution', '#tab_analysis_execution', 'data-toggle' => 'tab'
+          .tab-content
+            .tab-pane.active{ :id => 'tab_analysis_code' }
+
+              .btn-toolbar
+                .btn-group.button-tooltip{ 'data-tooltip_title' => "Send analysis result to upper code view" }
+                  %a.btn{ :id => 'btn-send-up', :name => 'action', :value => 'send-up', 'data-remote' => 'true' }
+                    %i.icon-arrow-up
+                    Send up
+
+              .tabbable
+                %ul.nav.nav-tabs{ :id => 'tabs_code_format' }
+                  %li.active= link_to 'Formatted', '#tab_code_format_pretty', 'data-toggle' => 'tab'
+                  %li= link_to 'Edit', '#tab_code_format_raw', 'data-toggle' => 'tab'
+                .tab-content
+                  .tab-pane.active{ :id => 'tab_code_format_pretty' }
+                    %pre.prettyprint.linenums{ :id => 'result_pretty', :style => 'padding-left:10px' }= h(@result_code) 
+                  .tab-pane{ :id => 'tab_code_format_raw' }
+                    ~ text_area_tag :result_code, :id => 'result_code', :class => 'span12 code', :rows => 10
+
+              #var_renaming.hide
+                .row-fluid
+                  .span6
+                    %table.table.table-bordered.table-striped#table_renaming
+                      %thead
+                        %tr
+                          %th Variable
+                          %th New Name
+                          %th{:style => 'width:120px'} Options
+                      %tbody
+                    %br/
+                %a.btn{ :id => 'btn-var-rename' }
+                  %i.icon-ok
+                  Rename &amp; Analyze
+
+
+            .tab-pane{ :id => 'tab_analysis_execution' }
+              %table.table.table-bordered.table-striped#execution_log
+                %thead
+                  %tr
+                    %th{:style => 'width:80px'} Type
+                    %th Message
+                    %th{:style => 'width:120px'} Data
+                %tbody
+
+      .tab-pane{ :id => 'tab_main_html' }
+        .btn-toolbar
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Create default HTML template" }
+            %a.btn{ :id => 'btn-html-template' }
+              %i.icon-pencil
+              Empty Template
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Save changes and use for code execution/DOM emulation" }
+            %a.btn.disabled{ :id => 'btn-html-save', 'data-remoteurl' => url(:backend, :store_html, :format => 'json') }
+              %i.icon-ok
+              Save Changes
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Extract JS code from script tags and send to tab Code Analysis" }
+            %a.btn{ :id => 'btn-html-extract', 'data-remoteurl' => url(:backend, :extract_script_tags, :format => :json) }
+              %i.icon-share
+              Extract Scripts
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Upload HTML file" }
+            %a.btn{ :id => 'btn-html-upload', 'data-remoteurl' => url(:backend, :upload, :format => 'json'), 'data-loading-text' => 'loading...' }
+              %i.icon-upload
+              Upload
+        ~ text_area_tag :html_analysis, :id => 'html_analysis', :value => h(@htmldoc), :class => 'span12 code', :rows => 10, :cols => 200
+        #html_upload_form.hide
+          = form_tag "htmldocform", :id => 'htmldocform', :action => '/backend/upload.json', :method => :post, :multipart => true do
+            = file_field_tag :html_file, :id => 'html_file'
+
+        %hr/
+        %h3 Result
+        ~ text_area_tag :html_result, :id => 'html_result', :value => '', :class => 'span12 code', :rows => 10, :cols => 200
+
+      .tab-pane{ :id => 'tab_main_data' }
+        .btn-toolbar
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Treat input as raw data" }
+            %a.btn{ :id => 'btn-data-raw', 'data-remoteurl' => url(:backend, :data_analyze, :format => 'json') }
+              %i.icon-search
+              Raw Data
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Scan input for hex codes (e.g. '909090' or '\\x90\\x90\\x90')" }
+            %a.btn{ :id => 'btn-data-hex', 'data-remoteurl' => url(:backend, :data_analyze, :format => 'json') }
+              %i.icon-search
+              Hex Data
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Scan input for unicode sequences (e.g. '%u9090', used with 'unescape()')" }
+            %a.btn{ :id => 'btn-data-unicode', 'data-remoteurl' => url(:backend, :data_analyze, :format => 'json') }
+              %i.icon-search
+              Unicode Shellcode
+          .btn-group.button-tooltip{ 'data-tooltip_title' => "Uload data file for analysis" }
+            %a.btn{ :id => 'btn-data-upload', 'data-remoteurl' => url(:backend, :upload, :format => 'json'), 'data-loading-text' => 'loading...' }
+              %i.icon-upload
+              Upload
+          ~ text_area_tag :data_analysis, :id => 'data_analysis', :value => h(@data_raw), :class => 'span12 code', :rows => 10, :cols => 200
+          #js_upload_form.hide
+            = form_tag "datadocform", :id => 'datadocform', :action => url(:backend, :upload, :format => 'json'), :method => :post, :multipart => true do
+              = file_field_tag :data_file, :id => 'data_file'
+
+          %hr/
+
+          .tabbable
+            %ul.nav.nav-tabs{ :id => 'tabs_data' }
+              %li.active= link_to 'Hex View', '#tab_data_hex', 'data-toggle' => 'tab'
+              %li= link_to 'Disassembler', '#tab_data_disasm', 'data-toggle' => 'tab'
+              %li= link_to 'Analysis', '#tab_data_analysis', 'data-toggle' => 'tab'
+            .tab-content
+              .tab-pane.active{ :id => 'tab_data_hex' }
+                %pre{ :id => 'hexdump', :style => 'padding-left:10px' }
+              .tab-pane{ :id => 'tab_data_disasm' }
+                %pre{ :id => 'result_disasm_pretty', :style => 'padding-left:10px' }
+              .tab-pane{ :id => 'tab_data_analysis' }
+                #data_analysis
+                  %h3 XOR Analysis
+                  #data_analysis_xor
+
+
+    .modal.hide.fade#modal_show_code
+      .modal-header
+        %a.close{ 'data-dismiss' => 'modal' } &times;
+        %h3 Code
+      .modal-body
+        ~ text_area_tag :modal_show_code_textarea, :id => 'modal_show_code_textarea', :value => '', :class => 'span12 code', :rows => 10
+      .modal-footer
+        %a.btn.btn-primary Send to Analyze
+        %a.btn Close
+
+    .modal.hide.fade#modal_show_trace
+      .modal-header
+        %a.close{ 'data-dismiss' => 'modal' } &times;
+        %h3 Trace
+      .modal-body
+        ~ text_area_tag :modal_show_trace_textarea, :id => 'modal_show_trace_textarea', :value => '', :class => 'span12 code', :rows => 10
+      .modal-footer
+        %a.btn Close
+
+
+  .span2
+    .well.sidebar-nav
+      %ul.nav.nav-list
+        %li.nav-header Code Analysis Options
+        .control-group
+          .controls
+            %label.checkbox
+              = check_box_tag :opt_no_trace_vars, :id => 'opt_no_trace_vars', :checked => false
+              Do not trace variable values
+        %li.nav-header Data Analysis Options
+        .control-group
+          %label.control-label{ :for => "opt_sc_arch" } Interpret Shellcode as
+          %select.span12{ :id => 'opt_sc_arch' }
+            %option{ :value => '32' } 32 Bit
+            %option{ :value => '64' } 64 Bit
+
+
+:javascript
+
+  var result_code_edited = false;
+  var new_varnames = {};
+
+  $(function () {
+
+    $("#btn-send-up").click(function() {
+      $('#orig_code').val($('#result_code').val());
+      return false;
+      });
+
+    $("#btn-analyze").click(function() {
+      var opts = get_options();
+      $("#btn-analyze").button('loading');
+      var url = $("#btn-analyze").data('remoteurl');
+      $.post(url, { action: 'analyze', code: $('#orig_code').val(), opts: opts }, function(response) {
+        if (response['status'] != 'ok') {
+          show_msg("Error parsing javascript.");
+          $("#btn-analyze").button('reset');
+          return;
+        }
+        $('#result_code').val(response['code']);
+        $('#result_pretty').text(response['code']);
+        prettyPrint();
+        result_code_edited = false;
+        $("#btn-analyze").button('reset');
+        $('a[href="#tab_analysis_code"]').tab('show');
+        prepare_var_renaming(response['varnames']);
+      }, 'json');
+      return false;
+    });
+
+    $("#btn-reformat").click(function() {
+      $("#btn-reformat").button('loading');
+      var url = $(this).data('remoteurl');
+      $.post(url, { action: 'notneeded', code: $('#orig_code').val() }, function(response) {
+        if (response['status'] != 'ok') {
+          show_msg("Error parsing javascript.");
+          $("#btn-reformat").button('reset');
+          return;
+        }
+        $('#result_code').val(response['code']);
+        $('#result_pretty').text(response['code']);
+        prettyPrint();
+        result_code_edited = false;
+        $("#btn-reformat").button('reset');
+        $('a[href="#tab_analysis_code"]').tab('show');
+      }, 'json');
+      return false;
+    });
+
+    $("#btn-execute").click(function() {
+      var url = $(this).data('remoteurl');
+      $.post(url, { action: 'notneeded', code: $('#orig_code').val() }, function(response) {
+        handle_execution(response);
+        $('a[href="#tab_analysis_execution"]').tab('show');
+      }, 'json');
+      return false;
+    });
+
+    $("#btn-reformat-inline").click(function() {
+      $("#btn-reformat").button('loading');
+      var url = $("#btn-reformat").data('remoteurl');
+      $.post(url, { action: 'notneeded', code: $('#orig_code').val() }, function(response) {
+        $('#orig_code').val(response['code']);
+        $("#btn-reformat").button('reset');
+      }, 'json');
+    });
+
+    $("#btn-var-rename").click(function() {
+      $("#btn-var-rename").button('loading');
+      var url = $("#btn-analyze").data('remoteurl');
+      var opts = get_options();
+      $.post(url, { action: 'analyze', code: $('#result_code').val(), new_varnames: new_varnames, opts: opts }, function(response) {
+        $('#result_code').val(response['code']);
+         $('#result_pretty').text(response['code']);
+        prettyPrint();
+        result_code_edited = false;
+        new_varnames = {};
+        redraw_rename_list();
+        $("#btn-var-rename").button('reset');
+        $('a[href="#tab_analysis_code"]').tab('show');
+        prepare_var_renaming(response['varnames']);
+      }, 'json');
+      return false;
+    });
+
+    $('#html_analysis').keyup(function() {
+      $('#btn-html-save').removeClass('disabled');
+    });
+
+    $("#btn-html-template").click(function() {
+      $('#html_analysis').val('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">\n<html>\n<body>\n</body>\n</html>');
+      $('#btn-html-save').removeClass('disabled');
+    });
+
+    $('#js_file').change(function() {
+      if ($('#js_file').val() == "") return;
+      var opts = {
+        dataType: 'json',
+        success: function(response) {
+          $('#orig_code').val(response['raw']);
+          $("#btn-js-upload").button('reset');
+        },
+        error: function() {
+          show_msg('Could not upload file');
+          $("#btn-js-upload").button('reset');
+        }
+      }
+      $("#btn-js-upload").button('loading');
+      $('#jsdocform').ajaxSubmit(opts);
+      $('#js_file').val("");
+    });
+
+    $('#html_file').change(function() {
+      if ($('#html_file').val() == "") return;
+      var opts = {
+        dataType: 'json',
+        success: function(response) {
+          $('#html_analysis').val(response['raw']);
+          $("#btn-html-upload").button('reset');
+          $('#btn-html-save').addClass('disabled');
+        },
+        error: function() {
+          show_msg('Could not upload file');
+          $("#btn-html-upload").button('reset');
+        }
+      }
+      $("#btn-html-upload").button('loading');
+      $('#htmldocform').ajaxSubmit(opts);
+      $('#html_file').val("");
+    });
+
+    $('#data_file').change(function() {
+      if ($('#data_file').val() == "") return;
+      var opts = {
+        dataType: 'json',
+        success: function(response) {
+          $('#data_analysis').val(response['raw']);
+          $("#btn-data-upload").button('reset');
+        },
+        error: function() {
+          show_msg('Could not upload file');
+          $("#btn-data-upload").button('reset');
+        }
+      }
+      $("#btn-data-upload").button('loading');
+      $('#datadocform').ajaxSubmit(opts);
+      $('#data_file').val("");
+    });
+
+    $.each(['html', 'js', 'data'], function(k, v) {
+      $("#btn-" + v + "-upload").click(function() {
+        $("#" + v + "_file").click();
+      });
+    });
+
+    $("#btn-html-extract").click(function() {
+      $('#btn-html-save').click();
+      var url = $("#btn-html-extract").data('remoteurl');
+      $.post(url, {}, function(response) {
+        if (response['status'] == 'ok') {
+          if (response['tag_count'] > 0) {
+            $('#orig_code').val('');
+            for (var i = 0; i < response['tag_count']; i++) {
+              $('#orig_code').val($('#orig_code').val() + 
+                "// content of script tag " + (i+1).toString() + "\r\n" + response['tags'][i] + "\r\n\r\n");
+            }
+            $('a[href="#tab_main_analysis"]').tab('show');
+          } else {
+           show_msg('No script tags found.'); 
+          }
+        } else {
+          show_msg('Extraction failed.');
+        }
+      }, 'json');
+    });
+
+    $("#btn-html-save").click(function() {
+      var url = $("#btn-html-save").data('remoteurl');
+      $.post(url, { action: 'notneeded', html: $('#html_analysis').val() }, function(response) {
+        $('#btn-html-save').addClass('disabled');
+      }, 'json');
+    });
+
+
+    $('a[data-toggle="tab"]').on('shown', function (e) {
+      if (result_code_edited) {
+        if (e.target.toString().match(/#tab_code_format_pretty$/)) {
+          $('#result_pretty').text($('#result_code').val());
+          prettyPrint();
+        }
+        result_code_edited = false;
+      }
+    });
+
+    $('#result_code').change(function() {
+      result_code_edited = true;
+    });
+
+    $('#btn-data-raw, #btn-data-hex, #btn-data-unicode').click(function() {
+      var action = this.id.match(/\w+$/)[0];
+      var opts = get_options();
+      $.post('#{url :backend, :data_analyze, :format => :json }', { action: action, opts: opts, data: $('#data_analysis').val() }, function(response) {
+        if (response['status'] == 'error') {
+          show_msg("An Error occured.");
+          return;
+        }
+        if (response['dump'] !== null) {
+          $('#hexdump').text(response['dump']);
+        }
+        if (response['disasm'] !== null) {
+          $('#result_disasm_pretty').text(response['disasm']);
+        }
+        if (response['analysis_xor'] !== null) {
+          var analysis_xor = response['analysis_xor'];
+          parent = $('#data_analysis_xor');
+          $('#data_analysis_xor div').remove();
+          if(analysis_xor.length > 0) {
+            $.each(analysis_xor, function(k, v) { 
+              div = $('<div>');
+              div.append($('<h5>').text("Decrpytion with XOR key " + v['key'] + " matched pattern(s): " + v['patterns']));
+              div.append($('<pre>').text(v['data']))
+              parent.append(div);
+            });
+          } else {
+            parent.append($('<div>').text("No results."));
+          }
+        }
+      }, 'json');
+    });
+
+  });
+
+  function handle_execution(response) {
+    entries = response['log'];
+    $('#execution_log tbody tr').remove();
+    tbl = $('#execution_log').find('tbody')
+    $.each(entries, function(k, v) {
+      var label_class = v['type'];
+      if (label_class === 'info') label_class = 'default';
+      if (label_class === 'error') label_class = 'important';
+      if (label_class === 'output') label_class = 'info';
+      var cell;
+      var row = $('<tr>');
+
+      cell = $('<td>');
+      cell.append($('<span>').addClass('label label-' + label_class).text(v['type']));
+      cell.appendTo(row);
+
+      $('<td>').text(v['msg']).appendTo(row);
+
+      if (v['data'] != null) {
+        cell = $('<td>');
+        var data = v['data'];
+        cell.data('raw', data['raw']);
+        cell.data('type', data['type']);
+        if (data['type'] == 'trace') {
+          cell.append($('<a>').addClass('btn').text('Show Trace').prepend($('<i>').addClass('icon-list')));
+        } else if (data['type'] == 'code') {
+          cell.append($('<a>').addClass('btn').text('Show Code').prepend($('<i>').addClass('icon-list')));
+        }
+        cell.appendTo(row);
+      } else {
+        $('<td>').text('-').appendTo(row);
+      }
+
+      tbl.append(row);
+    });
+    $('#execution_log a').click(handle_exec_show_data);
+    $('#html_result').val(response['html']);
+
+  }
+
+  function handle_exec_show_data() {
+    var data = $(this).parent().data('raw');
+    var modalname;
+    if ($(this).parent().data('type') === 'code') {
+      modalname = '#modal_show_code';
+      $('#modal_show_code a.btn-primary').click(function() {
+        $('#orig_code').val($('#modal_show_code_textarea').val());
+        $('#modal_show_code').modal('hide');
+      });
+    } else {
+      modalname = '#modal_show_trace';
+    }
+    $(modalname + '_textarea').val(data);
+    $(modalname + ' a:contains("Close")').click(function() {
+      $(modalname).modal('hide');
+    });
+    $(modalname).modal();
+  }
+
+  function prepare_var_renaming(varnames) {
+    html=$('#result_pretty').html()
+    $('#result_pretty span').each(function(element) {
+      var content = $(this).html();
+      content = content.replace(new RegExp("\\b([A-Za-z0-9_]+?)\\b", 'g'), function(match, varname, offset, s) {
+        if ($.inArray(varname, varnames) > -1) {
+          return '<b><i class="jsvar" data-tooltip_title="Click to Rename" data-popover_title="Rename Variable \'' + varname + '\'" data-content="" data-varname=' + varname + '>' + varname + '</i></b>';
+        } else {
+          return match;
+        }
+      });
+      $(this).html(content);
+    });
+
+    $('.jsvar').each(function() {
+      $(this).click(function() {
+        var varname = $(this).html();
+
+        var content = '<input id="new_varname_' + varname + '" type="text" value="' + varname + '"><br/><a class="btn btn-primary" onclick="rename_popover_click_rename(\'' + varname + '\');">Rename</a> <a class="btn" onclick="rename_popover_click_close(\'' + varname + '\');">Cancel</a>';
+
+        $(this).data('content', content);
+        $(this).popover('toggle');
+        $('#new_varname_' + varname).keypress(function(e) {
+          if (e.which == 13) {
+            rename_popover_click_rename(varname);
+          }
+        });
+        $('#new_varname_' + varname).select();
+        $('#new_varname_' + varname).focus();
+        return false;
+      });
+    });
+    $('.jsvar').tooltip({trigger: 'hover'});
+
+    $('.button-tooltip').tooltip({trigger: 'hover', delay: {show: 1000, hide: 100} });
+
+  }
+
+  function redraw_rename_list() {
+    count = 0;
+    $.each(new_varnames, function() { count ++ } );
+    if (count == 0) {
+      $('#var_renaming').hide();
+      return;
+    }
+
+    tbl = $('#table_renaming').find('tbody')
+    $('#table_renaming tbody tr').remove();
+
+    $.each(new_varnames, function(k, v) {
+      var row = $('<tr>');
+      $('<td>').text(k).appendTo(row);
+      $('<td>').text(v).appendTo(row);
+      var cell = $('<td>');
+      cell.data('varname', k);
+      var button = $('<a>').addClass('btn').text('Remove').prepend($('<i>').addClass('icon-remove'));
+      button.click(function() {
+        delete(new_varnames[k]);
+        redraw_rename_list();
+      });
+      cell.append(button);
+      cell.appendTo(row);
+      tbl.append(row);
+    });
+    $('#var_renaming').show();
+  }
+
+  function show_msg(msg, type) {
+    type = type || 'error';
+    $('#' + type + 'msg p').text(msg);
+    $('#' + type + 'msg').fadeIn(500).delay(2000).slideUp(500);
+  }
+
+  function get_options() {
+    opts = {};
+    opts['no_trace_vars'] = $('#opt_no_trace_vars').prop('checked');
+    opts['sc_arch'] = $('#opt_sc_arch').val();
+    return opts;
+  }
+
+
+  function rename_popover_click_rename(varname) {
+    new_varnames[varname] = $('#new_varname_' + varname).val();
+    $('.jsvar[data-varname="' + varname + '"]').popover('hide');
+    redraw_rename_list();
+  }
+
+  function rename_popover_click_close(varname) {
+    $('.jsvar[data-varname="' + varname + '"]').popover('hide');
+  }
+
