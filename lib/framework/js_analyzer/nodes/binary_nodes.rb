@@ -54,7 +54,13 @@ class AddNodeStrings < Plugin
 
 	def self.optimize(node, level)
 		if node.is_a?(RKelly::Nodes::AddNode) && node.left.is_a?(RKelly::Nodes::StringNode) && node.value.is_a?(RKelly::Nodes::StringNode)
-			concat = '"' + node.left.value.to_s[1..-2] + node.value.value.to_s[1..-2] + '"'
+			left = node.left.value.to_s[1..-2]
+			right = node.value.value.to_s[1..-2]
+			quote_left = node.left.value.to_s[0, 1]
+			quote_right = node.value.value.to_s[0, 1]
+			left.gsub!(/(?<!\\)"/, '\\"') if quote_left == "'"
+			right.gsub!(/(?<!\\)"/, '\\"') if quote_right == "'"
+			concat = '"' + left + right + '"'
 			res = RKelly::Nodes::StringNode.new(concat)
 			node.newvalue = res
 			return res
