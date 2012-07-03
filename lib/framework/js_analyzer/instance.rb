@@ -21,7 +21,7 @@ class Instance
 		begin
 			count = 0
 			last_result_code = nil
-			new_varnames = new_varnames.select { |e| e =~ /^[A-Za-z0-9_]+$/ } if new_varnames
+			new_varnames = new_varnames.delete_if { |k, v| v !~ /^[A-Za-z0-9_]+$/ } if new_varnames
 			result = process_iteration(code, new_varnames, opts)
 			while result[:code] != last_result_code && count < 10
 				last_result_code = result[:code]

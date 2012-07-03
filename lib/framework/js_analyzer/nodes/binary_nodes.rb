@@ -58,8 +58,8 @@ class AddNodeStrings < Plugin
 			right = node.value.value.to_s[1..-2]
 			quote_left = node.left.value.to_s[0, 1]
 			quote_right = node.value.value.to_s[0, 1]
-			left.gsub!(/(?<!\\)"/, '\\"') if quote_left == "'"
-			right.gsub!(/(?<!\\)"/, '\\"') if quote_right == "'"
+			left.gsub!(/.?"/) { |e| (e == '"' || e == '\\"') ? '\\"' : e[0, 1] + '\\"' } if quote_left == "'"
+			right.gsub!(/.?"/) { |e| (e == '"' || e == '\\"') ? '\\"' : e[0, 1] + '\\"' } if quote_right == "'"
 			concat = '"' + left + right + '"'
 			res = RKelly::Nodes::StringNode.new(concat)
 			node.newvalue = res
