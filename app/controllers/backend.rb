@@ -27,7 +27,7 @@ JSDetoxWeb.controllers :backend do
 			framework = JSDetox::JSAnalyzer::Instance.new
 			result = framework.reformat(orig_code)
 			if result
-				{ 
+				{
 					:status => :ok,
 					:code => result,
 				}.to_json

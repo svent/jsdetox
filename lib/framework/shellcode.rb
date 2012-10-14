@@ -16,7 +16,7 @@ class XorAnalyzer
 			end
 			if !matching_patterns.empty?
 				matches << {:key => key, :patterns => matching_patterns, :data => decoded }
-			end 
+			end
 		end
 		matches
 	end

@@ -113,8 +113,8 @@ class Instance
 				if node.respond_to?(name)
 					n = node.send(name)
 					if n.respond_to?(:newvalue) && n.newvalue
-					  newvalue = n.newvalue
-					  node.instance_variable_set("@#{name.to_s}", newvalue)
+						newvalue = n.newvalue
+						node.instance_variable_set("@#{name.to_s}", newvalue)
 					end
 				end
 			end
@@ -125,20 +125,20 @@ class Instance
 			if handlers
 				handlers.each do |handler|
 					if handler.respond_to?(:optimize)
-					  if node.is_a?(VarDeclNode) || node.is_a?(ResolveNode)
-					    if !flags[:no_resolve] && !flags[:is_var_assign_left_node]
-					      res = handler.optimize(node, level, @var_store, @sens.last)
-					    else
-					      if flags[:no_resolve] && node.is_a?(ResolveNode)
-					        @var_store.taint!(node.value)
-					      end
-					    end
-					  elsif node.is_a?(ExpressionStatementNode)
-					    handler.optimize(node, level, @var_store, @sens.last)
-					  else
-					    res = handler.optimize(node, level)
-					  end
-					  return res if res
+						if node.is_a?(VarDeclNode) || node.is_a?(ResolveNode)
+							if !flags[:no_resolve] && !flags[:is_var_assign_left_node]
+								res = handler.optimize(node, level, @var_store, @sens.last)
+							else
+								if flags[:no_resolve] && node.is_a?(ResolveNode)
+									@var_store.taint!(node.value)
+								end
+							end
+						elsif node.is_a?(ExpressionStatementNode)
+							handler.optimize(node, level, @var_store, @sens.last)
+						else
+							res = handler.optimize(node, level)
+						end
+						return res if res
 					end
 				end
 			end

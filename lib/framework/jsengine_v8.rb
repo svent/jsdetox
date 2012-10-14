@@ -95,7 +95,7 @@ class JSDocument < JSBase
 				return res
 			else
 				@log.log JSEngines::Log::INFO, "emulating read access on '#{@js_name}': returning function '#{name}'"
-				return lambda do |*msg| 
+				return lambda do |*msg|
 					res = @doc.send(name, *msg)
 					return res
 				end

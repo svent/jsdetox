@@ -1,7 +1,7 @@
 class InitDatabase < Sequel::Migration
-  def up
-  end
+	def up
+	end
 
-  def down
-  end
+	def down
+	end
 end

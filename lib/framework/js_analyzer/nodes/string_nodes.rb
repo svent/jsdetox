@@ -44,7 +44,7 @@ class StringNodes < Plugin
 							buf << ord.chr
 						else
 							buf << "\\x" + ord.to_s(16)
-						end 
+						end
 					when "u"
 						str.slice!(0, 1)
 						ord = str.slice!(0,4).to_i 16
@@ -52,8 +52,8 @@ class StringNodes < Plugin
 							buf << ord.chr
 						else
 							buf << "\\x" + ord.to_s(16)
-						end 
-					end   
+						end
+					end
 				else
 					buf << str.slice!(0, 1)
 				end

@@ -10,10 +10,7 @@ class FunctionCalls < Plugin
 
 	def self.optimize(node, level)
 		if node.is_a?(RKelly::Nodes::FunctionCallNode)
-			# begin
 			da = node.value
-			# rescue Exception
-			# end
 			return if !da.is_a?(DotAccessorNode)
 
 			if da.value.is_a?(NumberNode) && da.accessor.to_s == "toString" && node.arguments.value.length == 1 && node.arguments.value[0].is_a?(NumberNode)
@@ -21,13 +18,13 @@ class FunctionCalls < Plugin
 				arg1 = node.arguments.value[0].value.to_i
 				node.newvalue = StringNode.new( '"' + da.value.value.to_i.to_s(arg1) + '"' )
 			end
-			
+
 			if da.value.is_a?(ResolveNode) && da.value.value.to_s == "String" && da.accessor.to_s == "fromCharCode"
 
 				return if node.arguments.value.find { |e| !e.is_a?(NumberNode) }
 				node.newvalue = StringNode.new('"' + node.arguments.value.map{ |e| e.value.chr}.join('') + '"')
 			end
-			
+
 			if da.value.is_a?(StringNode) && da.accessor.to_s == "indexOf" && node.arguments.value.length == 1 && node.arguments.value[0].is_a?(StringNode)
 				base = da.value.value.to_s.gsub(/^['"]?|['"]?$/, "")
 				arg1 = node.arguments.value[0].value.to_s.gsub(/^['"]?|['"]?$/, "")

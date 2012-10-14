@@ -16,7 +16,6 @@ class BracketNodes < Plugin
 				node.newvalue = NumberNode.new(value.length)
 			end
 		end
-	
 
 	end
 end

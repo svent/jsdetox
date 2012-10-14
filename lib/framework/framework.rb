@@ -2,7 +2,7 @@
 
 frameworkbase = __FILE__
 while File.symlink?(frameworkbase)
-  frameworkbase = File.expand_path(File.readlink(frameworkbase), File.dirname(frameworkbase))
+	frameworkbase = File.expand_path(File.readlink(frameworkbase), File.dirname(frameworkbase))
 end
 
 frameworkbase = File.expand_path(File.dirname(frameworkbase))
