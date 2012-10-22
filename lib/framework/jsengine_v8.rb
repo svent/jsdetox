@@ -42,31 +42,12 @@ end
 
 class JSDocument < JSBase
 
-	DOC_PROPERTIES = ["/", "URL", "all?", "anchors", "any?", "applets", "at_css",
-		"at_xpath", "attribute_nodes", "attributes", "baseURI", "blank?", "body",
-		"cdata?", "child", "childNodes", "children", "close", "collect",
-		"collect_namespaces", "comment?", "content", "cookie",
-		"createDocumentFragment", "create_element", "css", "css_path", "decorate!",
-		"description", "doctype", "document", "documentElement", "documentURI",
-		"domConfig", "domain", "drop_while", "each", "each_with_index", "elem?",
-		"element?", "element_children", "elements", "encoding", "entries",
-		"enum_with_index", "errors", "external_subset", "find_all", "firstChild",
-		"first_element_child", "forms", "fragment?", "getImplementation", "group_by",
-		"hasAttributes", "hasChildNodes", "html?", "images", "implementation",
-		"inner_text", "inputEncoding", "internal_subset", "keys", "lastChild",
-		"last_element_child", "links", "localName", "map", "max", "max_by",
-		"meta_encoding", "min", "min_by", "minmax", "minmax_by", "name",
-		"namespaceURI", "namespace_scopes", "namespaces", "next", "nextSibling",
-		"next_element", "next_sibling", "nodeName", "nodeType", "nodeValue",
-		"node_name", "node_type", "none?", "normalize", "normalizeDocument", "one?",
-		"open", "ownerDocument", "parentNode", "partition", "path", "pointer_id",
-		"prefix", "previous", "previousSibling", "previous_element",
-		"previous_sibling", "read_only?", "referrer", "reject", "remove",
-		"remove_namespaces!", "root", "search", "select", "slop!", "sort", "sort_by",
-		"strictErrorChecking", "tagName", "take_while", "text", "text?", "textContent",
-		"title", "to_java", "to_str", "to_xml", "traverse", "unlink", "url",
-		"validate", "values", "version", "xml?", "xmlEncoding", "xmlStandalone",
-		"xmlVersion", "xpath"]
+	DOCUMENT_PROPERTIES =	%w(
+													anchors applets body cookie documentMode domain forms
+													images lastModified links readyState referrer title URL attributes baseURI
+													childNodes firstChild lastChild localName namespaceURI nextSibling nodeName
+													nodeType nodeValue ownerDocument parentNode prefix previousSibling textContent
+												)
 
 	attr_reader :doc
 
@@ -89,7 +70,7 @@ class JSDocument < JSBase
 
 	def [](name)
 		if @doc.respond_to?(name)
-			if DOC_PROPERTIES.include?(name)
+			if DOCUMENT_PROPERTIES.include?(name)
 				@log.log JSEngines::Log::INFO, "emulating read access on '#{@js_name}', getting property '#{name}'"
 				res = @doc.send(name)
 				return res
@@ -108,7 +89,7 @@ class JSDocument < JSBase
 	def []=(name, value)
 		if @doc.respond_to?(name)
 			@log.log JSEngines::Log::INFO, "emulating write access on #{@js_name}: '#{name}'"
-			if DOC_PROPERTIES.include?(name)
+			if DOCUMENT_PROPERTIES.include?(name)
 				res = @doc.send("#{name}=", value)
 				@log.log JSEngines::Log::INFO, "setting property '#{name}' to '#{res}'"
 				return res
@@ -120,6 +101,20 @@ class JSDocument < JSBase
 end
 
 class JSWindow < JSBase
+
+	WINDOW_PROPERTIES 	=	%w(
+													closed defaultStatus document frames history
+													innerHeight innerWidth length location name navigator opener outerHeight
+													outerWidth pageXOffset pageYOffset parent screen screenLeft screenTop screenX
+													screenY self status top
+												)
+
+	WINDOW_FUNCTIONS		=	%w(
+													alert blur clearInterval clearTimeout close confirm createPopup focus moveBy
+													moveTo open print prompt resizeBy resizeTo scroll scrollBy scrollTo setInterval
+													setTimeout
+												)
+
 	attr_reader :document
 
 	def initialize(ctx, log, js_name, document, navigator)
@@ -138,6 +133,21 @@ class JSWindow < JSBase
 
 	def eval
 		return lambda { |*msg| @log.log JSEngines::Log::WARNING, "tried to call window.eval()", { :type => 'code', :raw => msg.last } }
+	end
+
+	def [](name)
+		if ![WINDOW_PROPERTIES + WINDOW_FUNCTIONS].include?(name)
+			res = @ctx[name]
+			if res
+				@log.log JSEngines::Log::INFO, "emulating read access on '#{@js_name}', unknown property/method '#{name}'"
+				@log.log JSEngines::Log::INFO, "global function '#{name}' exists, emulating call of global function '#{name}' through '#{@js_name}.#{name}()'"
+				return res
+			else
+				super(name)
+			end
+		else
+			super(name)
+		end
 	end
 end
 
