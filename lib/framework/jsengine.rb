@@ -32,6 +32,7 @@ class Log
 	def log(type, msg, data = nil)
 		@entries ||= []
 		@entries << { :type => type, :msg => msg, :data => data }
+		nil
 	end
 end
 
