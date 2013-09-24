@@ -41,7 +41,7 @@ module RKelly
 			end
 
 			def visit_VarStatementNode(o)
-				o.value.map do |x|
+				decls = o.value.map do |x|
 					begin
 						var_stmt = x.accept(self)
 						varname = var_stmt[/^(\w+)\s*=/,1] || var_stmt
@@ -52,15 +52,15 @@ module RKelly
 						else
 							@varnames << varname
 						end
+						{ :var_stmt => var_stmt, :skip_decl => x.skip_decl }
 					rescue
-						"var #{x.accept(self)};"
+						{ :var_stmt => "#{x.accept(self)};", :skip_decl => false }
 					end
-					if x.skip_decl
-						"// var #{var_stmt};"
-					else
-						"var #{var_stmt};"
-					end
-				end.join("\n#{indent}")
+				end
+				res = ""
+				res << "var " + decls.select { |e| !e[:skip_decl] }.map { |e| e[:var_stmt] }.join(", ") + ";" if decls.count { |e| !e[:skip_decl] } > 0
+				res << "// var " + decls.select { |e| e[:skip_decl] }.map { |e| e[:var_stmt] }.join(", ") + ";" if decls.count { |e| e[:skip_decl] } > 0
+				res
 			end
 
 
