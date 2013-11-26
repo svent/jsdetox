@@ -2,7 +2,7 @@
 
 frameworkbase = __FILE__
 while File.symlink?(frameworkbase)
-	frameworkbase = File.expand_path(File.readlink(frameworkbase), File.dirname(frameworkbase))
+  frameworkbase = File.expand_path(File.readlink(frameworkbase), File.dirname(frameworkbase))
 end
 
 frameworkbase = File.expand_path(File.dirname(frameworkbase))
@@ -18,9 +18,9 @@ require 'js_analyzer/instance'
 require 'jsengine_v8'
 
 Dir.glob(File.join(frameworkbase, "js_analyzer/nodes/*.rb")).each do |file|
-	require file
+  require file
 end
 
 module JSDetox
-	VERSION = "0.1.4"
+  VERSION = "0.1.4"
 end

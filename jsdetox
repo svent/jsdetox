@@ -5,29 +5,29 @@ require 'optparse'
 options = { 'host' => '127.0.0.1' }
 
 opts = OptionParser.new do |opts|
-	opts.banner = "Usage: #{$0} [options]"
+  opts.banner = "Usage: #{$0} [options]"
 
-	opts.separator "Options:"
+  opts.separator "Options:"
 
-	opts.on("-p", "-p <port>", "Use the specified TCP port") do |p|
-		options['port'] = p
-	end
+  opts.on("-p", "-p <port>", "Use the specified TCP port") do |p|
+    options['port'] = p
+  end
 
-	opts.on("-l", "-l <addr>", "Listen on the specified IP address") do |l|
-		options['host'] = l
-	end
+  opts.on("-l", "-l <addr>", "Listen on the specified IP address") do |l|
+    options['host'] = l
+  end
 
-	opts.on_tail("-h", "--help", "Show this message") do
-		puts opts
-		exit
-	end
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
 end
 
 begin
-	opts.parse!(ARGV)
+  opts.parse!(ARGV)
 rescue OptionParser::InvalidOption
-	puts "Invalid option, try -h for usage"
-	exit
+  puts "Invalid option, try -h for usage"
+  exit
 end
 
 print "[JSDetox] Loading framework ... "
