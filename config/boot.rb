@@ -9,8 +9,10 @@ Bundler.require(:default, PADRINO_ENV)
 
 
 Padrino.before_load do
-	require File.join(PADRINO_ROOT, 'ext/metasm/metasm')
-	require File.join(PADRINO_ROOT, 'ext/taka/lib/taka')
+  require File.join(PADRINO_ROOT, 'ext/metasm/metasm')
+  require File.join(PADRINO_ROOT, 'ext/taka/lib/taka')
+  $: << File.join(PADRINO_ROOT, 'ext/rkelly/lib')
+  require File.join(PADRINO_ROOT, 'ext/rkelly/lib/rkelly')
 end
 
 Padrino.after_load do
