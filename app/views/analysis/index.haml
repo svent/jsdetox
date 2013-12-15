@@ -202,6 +202,12 @@
             %label.checkbox
               = check_box_tag :opt_no_trace_vars, :id => 'opt_no_trace_vars', :checked => false
               Do not trace variable values
+        %li.nav-header Code Execution Options
+        .control-group
+          .controls
+            %label.checkbox
+              = check_box_tag :opt_exec_eval, :id => 'opt_exec_eval', :checked => false
+              Execute eval() statements
         %li.nav-header Data Analysis Options
         .control-group
           %label.control-label{ :for => "opt_sc_arch" } Interpret Shellcode as
@@ -264,7 +270,8 @@
 
     $("#btn-execute").click(function() {
       var url = $(this).data('remoteurl');
-      $.post(url, { action: 'notneeded', code: $('#orig_code').val() }, function(response) {
+      var opts = get_options();
+      $.post(url, { action: 'execute', code: $('#orig_code').val(), opts: opts}, function(response) {
         handle_execution(response);
         $('a[href="#tab_analysis_execution"]').tab('show');
       }, 'json');
@@ -580,6 +587,7 @@
   function get_options() {
     opts = {};
     opts['no_trace_vars'] = $('#opt_no_trace_vars').prop('checked');
+    opts['exec_eval'] = $('#opt_exec_eval').prop('checked');
     opts['sc_arch'] = $('#opt_sc_arch').val();
     return opts;
   }

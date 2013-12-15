@@ -41,9 +41,10 @@ JSDetoxWeb.controllers :backend do
     if params[:code]
       session[:orig_code] = params[:code]
       htmldoc = session[:htmldoc]
+      opts = params[:opts] || {}
 
       engine = JSDetox::JSEngines::V8Engine::Instance.new
-      res = engine.execute(params[:code], htmldoc)
+      res = engine.execute(params[:code], opts, htmldoc)
       res.to_json
     end
   end

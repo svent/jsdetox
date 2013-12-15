@@ -155,7 +155,8 @@ class Instance
 
   attr_reader :log
 
-  def execute(code, html = nil)
+  def execute(code, opts = {}, html = nil)
+    @eval_count = 0
     ctx = V8::Context.new
     log = JSEngines::Log.new
     if !html
@@ -172,7 +173,23 @@ class Instance
     ctx['document'] = document
     ctx['window'] = JSWindow.new(ctx, log, "window", document, navigator)
     ctx['jsdetox'] = Debugger.new(log)
-    ctx['eval'] = lambda { |*code| log.log JSEngines::Log::WARNING, "tried to call eval()" % code, { :type => 'code', :raw => code.last } }
+    if opts[:exec_eval] == "true"
+      ctx['eval'] = lambda do |*code|
+        @eval_count += 1
+        if @eval_count > 1000
+          raise "Aborting, traced more than 1000 eval() calls."
+        end
+        log.log JSEngines::Log::WARNING, "eval() call executed" % code, { :type => 'code', :raw => code.last }; ctx.eval(code.last)
+      end
+    else
+      ctx['eval'] = lambda do |*code|
+        @eval_count += 1
+        if @eval_count > 1000
+          raise "Aborting, traced more than 1000 eval() calls. The code might contain eval() calls designed to hinder analysis, the option 'Execute eval() statements' might help in these cases."
+        end
+        log.log JSEngines::Log::WARNING, "tried to call eval()" % code, { :type => 'code', :raw => code.last }
+      end
+    end
 
     begin
       ctx.eval(code)
