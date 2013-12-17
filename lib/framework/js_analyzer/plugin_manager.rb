@@ -6,7 +6,9 @@ class PluginManager
   def self.register_plugin(plugin, node_class)
     @@registered_plugins ||= {}
     @@registered_plugins[node_class] ||= []
-    @@registered_plugins[node_class] << plugin
+    if !@@registered_plugins[node_class].include?(plugin)
+      @@registered_plugins[node_class] << plugin
+    end
   end
 
   def self.registered_plugins
