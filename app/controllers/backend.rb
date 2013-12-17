@@ -62,6 +62,7 @@ JSDetoxWeb.controllers :backend do
     else
       return { :status => 'error' }.to_json
     end
+    data.force_encoding('UTF-8') if data.respond_to?(:force_encoding)
     {
       :status => 'ok',
       :raw => data,
