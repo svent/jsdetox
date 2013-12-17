@@ -22,5 +22,5 @@ Dir.glob(File.join(frameworkbase, "js_analyzer/nodes/*.rb")).each do |file|
 end
 
 module JSDetox
-  VERSION = "0.1.4"
+  VERSION = "0.2.0"
 end
