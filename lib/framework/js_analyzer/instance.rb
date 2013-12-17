@@ -135,6 +135,8 @@ class Instance
               end
             elsif node.is_a?(ExpressionStatementNode)
               handler.optimize(node, level, @var_store, @sens.last)
+            elsif node.is_a?(PrefixNode) || node.is_a?(PostfixNode)
+              handler.optimize(node, level, @var_store, @sens.last)
             else
               res = handler.optimize(node, level)
             end

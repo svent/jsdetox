@@ -11,6 +11,7 @@ module RKelly
       attr_accessor :true_block
       attr_accessor :else_block
       attr_accessor :parent_node
+      attr_accessor :operand
 
       def to_ecma(varnames = nil, new_varnames = nil)
         ECMAVisitor.new(varnames, new_varnames).accept(self)
