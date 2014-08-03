@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'v8'
+require 'base64'
 
 module JSDetox
 module JSEngines
@@ -123,6 +124,14 @@ class JSWindow < JSBase
     @document = document
   end
 
+  def atob(data)
+    @ctx['atob'].call(data)
+  end
+
+  def btoa(data)
+    @ctx['btoa'].call(data)
+  end
+
   def navigator
     return @navigator
   end
@@ -173,6 +182,12 @@ class Instance
     ctx['document'] = document
     ctx['window'] = JSWindow.new(ctx, log, "window", document, navigator)
     ctx['jsdetox'] = Debugger.new(log)
+    ctx['atob'] = lambda do |*data|
+      return Base64.decode64(data.map(&:to_s).join(''))
+    end
+    ctx['btoa'] = lambda do |*data|
+      return Base64.encode64(data.map(&:to_s).join('')).gsub("\n", '')
+    end
     if opts[:exec_eval] == "true"
       ctx['eval'] = lambda do |*code|
         @eval_count += 1
