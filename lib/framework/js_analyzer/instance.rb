@@ -63,8 +63,6 @@ class Instance
     return { :code => newcode, :varnames => varnames }
   end
 
-  private
-
   def process_node(node, level, flags = {})
     flags = flags.dup
     return if !node
