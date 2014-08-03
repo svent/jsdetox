@@ -234,7 +234,7 @@
       var url = $("#btn-analyze").data('remoteurl');
       $.post(url, { action: 'analyze', code: $('#orig_code').val(), opts: opts }, function(response) {
         if (response['status'] != 'ok') {
-          show_msg("Error parsing javascript.");
+          show_msg(response['error']);
           $("#btn-analyze").button('reset');
           return;
         }
@@ -254,7 +254,7 @@
       var url = $(this).data('remoteurl');
       $.post(url, { action: 'notneeded', code: $('#orig_code').val() }, function(response) {
         if (response['status'] != 'ok') {
-          show_msg("Error parsing javascript.");
+          show_msg(response['error']);
           $("#btn-reformat").button('reset');
           return;
         }
@@ -581,7 +581,7 @@
   function show_msg(msg, type) {
     type = type || 'error';
     $('#' + type + 'msg p').text(msg);
-    $('#' + type + 'msg').fadeIn(500).delay(2000).slideUp(500);
+    $('#' + type + 'msg').fadeIn(500).delay(5000).slideUp(500);
   }
 
   function get_options() {

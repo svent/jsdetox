@@ -11,9 +11,11 @@ class Instance
     begin
       parser = RKelly::Parser.new
       ast = parser.parse(code)
-      return ast.to_ecma
+      return { :status => :ok, :code => ast.to_ecma }
+    rescue SystemStackError
+      return { :status => :error, :error => "Stack limit exceeded. Please try to adjust the stack limit using 'ulimit -s' (Ruby 1.8/1.9) or 'export RUBY_THREAD_VM_STACK_SIZE (Ruby >= 2.0)" }
     rescue Exception
-      return nil
+      return { :status => :error, :error => "Error parsing Javascript Code" }
     end
   end
 
@@ -28,9 +30,11 @@ class Instance
         result = process_iteration(result[:code], nil, opts)
         count += 1
       end
-      result
+      return { :status => :ok, :code => result[:code], :varnames => result[:varnames] }
+    rescue SystemStackError
+      return { :status => :error, :error => "Stack limit exceeded. Please try to adjust the stack limit using 'ulimit -s' (Ruby 1.8/1.9) or 'export RUBY_THREAD_VM_STACK_SIZE (Ruby >= 2.0)" }
     rescue Exception
-      return nil
+      return { :status => :error, :error => "Error parsing Javascript Code" }
     end
   end
 

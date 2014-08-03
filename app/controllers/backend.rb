@@ -8,15 +8,7 @@ JSDetoxWeb.controllers :backend do
       session[:orig_code] = orig_code
       framework = JSDetox::JSAnalyzer::Instance.new
       result = framework.analyze(orig_code, new_varnames, opts)
-      if result
-        return {
-          :status => :ok,
-          :code => result[:code],
-          :varnames => result[:varnames],
-        }.to_json
-      else
-        return { :status => :error }.to_json
-      end
+      return result.to_json
     end
   end
 
@@ -26,14 +18,7 @@ JSDetoxWeb.controllers :backend do
       session[:orig_code] = orig_code
       framework = JSDetox::JSAnalyzer::Instance.new
       result = framework.reformat(orig_code)
-      if result
-        {
-          :status => :ok,
-          :code => result,
-        }.to_json
-      else
-        return { :status => :error }.to_json
-      end
+      return result.to_json
     end
   end
 
