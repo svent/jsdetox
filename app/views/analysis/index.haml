@@ -527,7 +527,7 @@
 
     $('.jsvar').each(function() {
       $(this).click(function() {
-        var varname = $(this).html();
+        var varname = $(this).data('varname');
 
         var content = '<input id="new_varname_' + varname + '" type="text" value="' + varname + '"><br/><a class="btn btn-primary" onclick="rename_popover_click_rename(\'' + varname + '\');">Rename</a> <a class="btn" onclick="rename_popover_click_close(\'' + varname + '\');">Cancel</a>';
 
