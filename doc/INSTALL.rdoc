@@ -2,8 +2,50 @@
 
 JSDetox should work on most Linux distributions - major versions get
 tested on the current LTS version of Linux Mint / Ubuntu.
-The development is currently done on Gentoo Linux with the latest
-chrome browser, so that combination should always work.
+
+
+== Installation on Linux Mint 17 LTS / Ubuntu 14.04 LTS:
+  sudo apt-get install git ruby ruby-dev bundler build-essential
+  cd #target-dir#
+  git clone https://github.com/svent/jsdetox.git
+  cd jsdetox
+  sudo bundle install
+  ./jsdetox
+
+== Installation with chruby and Ruby 2.1
+  # install ruby-install, see https://github.com/postmodern/ruby-install
+  wget -O ruby-install-0.4.3.tar.gz https://github.com/postmodern/ruby-install/archive/v0.4.3.tar.gz
+  tar -xzvf ruby-install-0.4.3.tar.gz
+  cd ruby-install-0.4.3/
+  sudo make install
+
+  # install ruby
+  ruby-install ruby 2.1
+
+  # install chruby, see https://github.com/postmodern/chruby#install
+  wget -O chruby-0.3.8.tar.gz https://github.com/postmodern/chruby/archive/v0.3.8.tar.gz
+  tar -xzvf chruby-0.3.8.tar.gz
+  cd chruby-0.3.8/
+  sudo make install
+
+  # load chruby by default
+  echo "source /usr/local/share/chruby/chruby.sh" >>~/.bashrc
+
+  # load chruby for the current session
+  source /usr/local/share/chruby/chruby.sh
+
+  # enable ruby 2.1
+  # needed every time when running JSDetox unless you enable auto switching:
+  # https://github.com/postmodern/chruby#auto-switching
+  chruby ruby-2.1
+
+  # install jsdetox
+  gem install bundler
+  cd #target-dir#
+  git clone https://github.com/svent/jsdetox.git
+  cd jsdetox
+  bundle install
+  ./jsdetox
 
 
 == Installation on Linux Mint 13 / Ubuntu 12.04:
@@ -49,9 +91,9 @@ update to the latest version:
 
 = Dependencies
 
-JSDetox is written in ruby and compatible with version 1.8 and 1.9.
-Ruby 1.9 has a much better performance, so it is the recommended
-version.
+JSDetox is written in Ruby and compatible with version 1.8, 1.9 and 2.0.
+Ruby 1.9 and higher has a much better performance and should be used
+if possible.
 
 JSDetox has the following gem dependencies, managed with bundler:
 * rake
@@ -64,7 +106,7 @@ JSDetox has the following gem dependencies, managed with bundler:
 * nokogiri
 * hexdump
 
-The libraries metasm and taka come bundled with JSDetox as there is no
+The libraries metasm, taka and rkelly come bundled with JSDetox as there is no
 maintained gem of the latest version available.
 
 You should use a modern HTML 5 capable browser to access the web gui
