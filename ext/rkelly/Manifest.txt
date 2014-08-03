@@ -4,6 +4,8 @@ README.rdoc
 Rakefile
 lib/parser.y
 lib/rkelly.rb
+lib/rkelly/char_pos.rb
+lib/rkelly/char_range.rb
 lib/rkelly/constants.rb
 lib/rkelly/generated_parser.rb
 lib/rkelly/js.rb
@@ -106,6 +108,8 @@ test/test_bracket_accessor_node.rb
 test/test_break_node.rb
 test/test_case_block_node.rb
 test/test_case_clause_node.rb
+test/test_char_pos.rb
+test/test_char_range.rb
 test/test_comma_node.rb
 test/test_comments.rb
 test/test_conditional_node.rb

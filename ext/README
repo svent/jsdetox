@@ -6,6 +6,8 @@ removed.
 
 Taka contains some changes needed for JSDetox.
 
-As rkelly is not maintained anymore, the source for this library is
-now included with JSDetox to enable bugfixes and minor changes.
-This fork is maintained at https://github.com/svent/rkelly.
+rkelly is not maintained anymore by its original author, but nene
+maintains a repository with valuable bugfixes and improvements
+that is used by JSDetox:
+https://github.com/nene/rkelly-remix
+

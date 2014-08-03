@@ -6,8 +6,9 @@ Hoe.plugin :git     # `gem install hoe-git`
 
 GENERATED_PARSER = "lib/rkelly/generated_parser.rb"
 
-HOE = Hoe.spec('rkelly') do |p|
+HOE = Hoe.spec('rkelly-remix') do |p|
   developer('Aaron Patterson', 'aaron.patterson@gmail.com')
+  developer('Rene Saarsoo', 'rene.saarsoo@sencha.com')
   self.readme_file   = 'README.rdoc'
   self.history_file  = 'CHANGELOG.rdoc'
   self.extra_rdoc_files  = FileList['*.rdoc']

@@ -1,3 +1,3 @@
 module RKelly
-  VERSION = '1.0.6'
+  VERSION = '0.0.5'
 end

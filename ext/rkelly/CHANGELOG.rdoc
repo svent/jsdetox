@@ -1,21 +1,26 @@
-= RKelly CHANGELOG
+= RKelly-Remix CHANGELOG
 
-=== 1.0.3
+=== 0.0.5
 
-* Bugfixes
+* Update list of reserved words to match ECMAScript 5
+* Fix ecma visitor for function expressions with name
 
-  * Fixed a typo in visitor.rb
-  * Fixed syntax error class
-  * Regex tonenization (thanks Josh Dzielak)
+=== 0.0.4
 
-=== 1.0.1
+* Allow use of keywords in property names.
 
-* Bugfixes
+=== 0.0.3
 
-  * Fixed nondeterministic file order loading issue.
+* Add RKelly::Parser#stopped_at method for error reporting.
+
+=== 0.0.2
+
+* Handle multibyte characters without crashing.
 
 === 0.0.1
 
-* Added dynamic method assignment
-* Birthday!
-
+* A fork of RKelly
+* 10x speedup of Tokenizer.
+* Full begin/end line/char info on each node.
+* List all comment nodes in root node instead of attempting to associate them with syntax nodes and failing at it.
+* Recognize /[/]/ as valid JS regex.

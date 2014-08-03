@@ -13,8 +13,12 @@ module RKelly
           r = super(val.map { |v|
               v.is_a?(Token) ? v.to_racc_token[1] : v
             }, _values, result)
-          if token = val.find { |v| v.is_a?(Token) }
-            r.line = token.line if r.respond_to?(:line)
+
+          suitable_values = val.flatten.find_all {|v| v.is_a?(Node) || v.is_a?(Token) }
+          first = suitable_values.first
+          last = suitable_values.last
+          if first
+            r.range = CharRange.new(first.range.from, last.range.to) if r.respond_to?(:range)
             r.filename = @filename if r.respond_to?(:filename)
           end
           r
@@ -37,34 +41,29 @@ module RKelly
       @position = 0
       @filename = filename
       ast = do_parse
-      apply_comments(ast)
+      ast.comments = @comments if ast
+      ast
     end
 
     def yyabort
       raise "something bad happened, please report a bug with sample JavaScript"
     end
 
-    private
-    def apply_comments(ast)
-      ast_hash = Hash.new { |h,k| h[k] = [] }
-      (ast || []).each { |n|
-        next unless n.line
-        ast_hash[n.line] << n
-      }
-      max = ast_hash.keys.sort.last
-      @comments.each do |comment|
-        node = nil
-        comment.line.upto(max) do |line|
-          if ast_hash.key?(line)
-            node = ast_hash[line].first
-            break
-          end
-        end
-        node.comments << comment if node
-      end if max
-      ast
+    # When parsing finishes without all tokens being parsed, returns
+    # the token at which the parsing stopped.  Returns nil when parser
+    # reached to the very last token (but possibly still failed as it
+    # expeced more tokens).
+    #
+    # Useful for pin-pointing the position of a syntax error.
+    def stopped_at
+      if @position < @tokens.length
+        @tokens[@position-1]
+      else
+        nil
+      end
     end
 
+    private
     def on_error(error_token_id, error_value, value_stack)
       if logger
         logger.error(token_to_str(error_token_id))
