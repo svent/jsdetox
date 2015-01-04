@@ -195,7 +195,11 @@ class Instance
           raise "Aborting, traced more than 1000 eval() calls."
         end
         log.log JSEngines::Log::WARNING, "eval() call executed" % code, { :type => 'code', :raw => code.last }
-        ctx.eval(code.last)
+
+        if code.last.is_a?(Proc) || code.last.is_a?(V8::Function)
+          return code.last
+        end
+        return ctx.eval(code.last)
       end
     else
       ctx['eval'] = lambda do |*code|
