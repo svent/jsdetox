@@ -9,9 +9,8 @@ class FunctionCalls < Plugin
   handle DotAccessorNode
 
   def self.optimize(node, level)
-    if node.is_a?(RKelly::Nodes::FunctionCallNode)
+    if node.is_a?(RKelly::Nodes::FunctionCallNode) && node.value.is_a?(DotAccessorNode)
       da = node.value
-      return if !da.is_a?(DotAccessorNode)
 
       if da.value.is_a?(NumberNode) && da.accessor.to_s == "toString" && node.arguments.value.length == 1 && node.arguments.value[0].is_a?(NumberNode)
         base = da.value.value.to_s
@@ -20,7 +19,6 @@ class FunctionCalls < Plugin
       end
 
       if da.value.is_a?(ResolveNode) && da.value.value.to_s == "String" && da.accessor.to_s == "fromCharCode"
-
         return if node.arguments.value.find { |e| !e.is_a?(NumberNode) }
         node.newvalue = StringNode.new('"' + node.arguments.value.map{ |e| e.value.chr}.join('') + '"')
       end
@@ -34,6 +32,15 @@ class FunctionCalls < Plugin
       if da.value.is_a?(StringNode) && da.accessor.to_s == "length"
         base = da.value.value.to_s.gsub(/^['"]?|['"]?$/, "")
         node.newvalue = NumberNode.new(base.length)
+      end
+    end
+
+    if node.is_a?(FunctionCallNode) && node.value.is_a?(BracketAccessorNode) 
+      ba = node.value
+      if ba.value.is_a?(ResolveNode) && ba.value.value.to_s == "String" && 
+        ba.accessor.is_a?(StringNode) && ba.accessor.value.to_s == '"fromCharCode"'
+        return if node.arguments.value.find { |e| !e.is_a?(NumberNode) }
+        node.newvalue = StringNode.new('"' + node.arguments.value.map{ |e| e.value.chr}.join('') + '"')
       end
     end
 
